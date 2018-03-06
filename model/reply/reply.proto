@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package reply;
+
+service ReplyService {
+    rpc Add(AddRequest) returns (AddResponse);
+    rpc List(ListRequest) returns (ListResponse);
+}
+
+// 评论类型
+enum ReplyType {
+    PLAY = 0;
+}
+
+// ------------------- 添加评论 -------------------
+message AddRequest {
+    int64  mid = 1;
+    string sourceId = 2;
+    int64  typeId = 3;
+    int64  parentId = 4;
+    string comment = 5;
+}
+
+message AddResponse {
+    int64  code = 1;
+    string message = 2;
+}
+
+// ------------------- 获取评论 -------------------
+message ListRequest {
+    string sourceId = 1;
+    int64  typeId = 2;
+    int64  pn = 3;
+    int64  ps = 4;
+    int64  order = 5;
+}
+
+message ListResponse {
+    int64  code = 1;
+    string message = 2;
+    data   data = 3;
+}
+
+message data {
+    map<int64, reply> all = 1;
+    repeated reply rs = 2;
+    int64 count = 3;
+}
+
+message reply {
+    int64   id = 1;
+    string  sourceId =2;
+    int64   typeId = 3;
+    int64   mid = 4;
+    string  comment = 5;
+    int64   parentId = 6;
+    string  path = 7;
+    int64   state = 8;
+    int64 created = 9;
+    repeated int64 rids = 10;
+}

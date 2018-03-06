@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+    rpc UserById(UserByIdRequest) returns (UserByIdResponse){};
+    rpc UserByIds(UserByIdsRequest) returns (UserByIdsResponse){};
+    rpc UserByGouhao(UserByGouhaoRequest) returns (UserByGouhaoResponse){};
+}
+
+
+// ------------------- single用户 by id -------------------
+message UserByIdRequest {
+    int64  uid = 1;
+}
+
+message UserByIdResponse {
+    int64  code    = 1;
+    string message = 2;
+    User   user    = 3;
+}
+
+
+// ------------------- mulity用户 by ids -------------------
+message UserByIdsRequest {
+    repeated int64 Uids = 1;
+}
+
+message UserByIdsResponse {
+    int64    code       = 1;
+    string   message    = 2;
+    repeated User Users = 3;
+}
+
+
+// ------------------- single用户 by gouhao -------------------
+message UserByGouhaoRequest {
+    int64  Gouhao = 1;
+}
+
+message UserByGouhaoResponse {
+    int64  code    = 1;
+    string message = 2;
+    User   user    = 3;
+}
+
+// ------------------- user -------------------
+
+message User {
+    int64   Id       = 1;
+    string  Name     = 2;
+    string  Phone    = 3;
+    int32   Sex      = 4;
+    int32   Status   = 5;
+    string  Avatar           = 6;
+    int64   Gouhao           = 7;
+    string  Avatars          = 8;
+    string  Signature        = 9;
+    int64   GamePower        = 10;
+    int64   Mark             = 11;
+    string  UserGroup        = 12;
+    string  UserIcon         = 13;
+    string  GreetWord        = 14;
+    int32   GreetWordFirst   = 15;
+    int32   Invalid          = 16;
+    int32   Level            = 17;
+    string  QuestionPhoto    = 18;
+    string  BackGroundImage  = 19;
+    string  Lan              = 20;
+    string  Notify           = 21;
+    string  UniquePhone      = 22;
+    string  CountryCode      = 23;
+    int32   Privacy          = 24;
+    int32   LoadRecTags      = 25;
+    string  AccessToken      = 26;
+    string  LoginPwd         = 27;
+    string  Appfrom          = 28;
+    string  Appver           = 29;
+    string  UpdateAppver     = 30;
+    string  AppfromOri       = 31;
+    string  Appid            = 32;
+    int64   Birthday         = 33;
+    int64   LastLogin        = 34;
+    int64   Created          = 35;
+    int64   Updated          = 36;
+}
