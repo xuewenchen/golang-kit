@@ -15,7 +15,7 @@ type Service struct {
 	keys map[string]string // key:secret
 }
 
-func NewIdentify(c *config.Identify) *Service {
+func New(c *config.Identify) *Service {
 	return &Service{
 		c: c,
 		keys: map[string]string{
@@ -65,17 +65,5 @@ func (s *Service) Verify(c context.Context) (err error) {
 
 		}
 	}
-	return
-}
-
-func (s *Service) Login(c context.Context) (err error) {
-	return
-}
-
-func (s *Service) Logout(c context.Context) (err error) {
-	return
-}
-
-func (s *Service) IsLogin(c context.Context) (err error) {
 	return
 }

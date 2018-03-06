@@ -19,6 +19,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -49,6 +50,7 @@ type Client struct {
 	client    *xhttp.Client
 	dialer    *net.Dialer
 	transport *xhttp.Transport
+	timeout   atomic.Value
 }
 
 // NewClient new a http client.
@@ -66,6 +68,7 @@ func NewClient(c *config.HTTPClient) *Client {
 	client.client = &xhttp.Client{
 		Transport: client.transport,
 	}
+	client.timeout.Store(make(map[string]time.Duration))
 	return client
 }
 
@@ -107,12 +110,16 @@ func (client *Client) Post(c context.Context, uri, ip string, params url.Values,
 // Do sends an HTTP request and returns an HTTP response.
 func (client *Client) Do(c context.Context, req *xhttp.Request, res interface{}) (err error) {
 	var (
+		ok      bool
 		bs      []byte
 		timeout time.Duration
 		cancel  func()
 		resp    *xhttp.Response
 	)
 	// TODO timeout use full path
+	if timeout, ok = client.timeout.Load().(map[string]time.Duration)[req.URL.Path]; !ok {
+		timeout = time.Duration(client.conf.Timeout)
+	}
 	c, cancel = context.WithTimeout(c, timeout)
 	defer cancel()
 	req = req.WithContext(c)

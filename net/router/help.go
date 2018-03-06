@@ -43,37 +43,6 @@ func (r *Router) preHandler(c kitCtx.Context) {
 	return
 }
 
-func (r *Router) LoginHandler(c kitCtx.Context) {
-	if err := r.Identify.Login(c); err != nil {
-		c.Result()["code"] = err
-	} else {
-		c.Result()["code"] = ecode.OK
-	}
-	r.writerHandler(c)
-	c.Cancel()
-	return
-}
-
-func (r *Router) LogoutHandler(c kitCtx.Context) {
-	if err := r.Identify.Logout(c); err != nil {
-		c.Result()["code"] = err
-	} else {
-		c.Result()["code"] = ecode.OK
-	}
-	r.writerHandler(c)
-	c.Cancel()
-	return
-}
-
-func (r *Router) isLoginHandler(c kitCtx.Context) {
-	if err := r.Identify.IsLogin(c); err != nil {
-		c.Result()["code"] = err
-		r.writerHandler(c)
-		c.Cancel()
-	}
-	return
-}
-
 func (r *Router) identifyHandler(c kitCtx.Context) {
 	if err := r.Identify.Verify(c); err != nil {
 		c.Result()["code"] = err
@@ -115,15 +84,14 @@ func (r *Router) JSONResult(c kitCtx.Context) (bs []byte) {
 		res["code"] = ret
 	} else {
 		switch res["code"].(type) {
+		case error:
+			ec, _ := res["code"].(error)
+			ret = ecode.Lookup(ec)
+			res["message"] = ret.Message()
 		case ecode2.Ecode2:
 			ec, _ := res["code"].(ecode2.Ecode2)
 			res["code"] = ec.ToInt()
 			res["message"] = ec.ToString()
-		case error:
-			ec, _ := res["code"].(error)
-			ret = ecode.Lookup(ec)
-			res["code"] = int(ret)
-			res["message"] = ret.Message()
 		default:
 			ret = ecode.ServerErr
 			res["message"] = ret.Message()

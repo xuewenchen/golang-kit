@@ -10,29 +10,20 @@ type Router struct {
 	c         *config.Router
 	Mux       *http.ServeMux
 	Hand      *Handle
-	Identify  identify.Indentify
+	Identify  *identify.Service
 	slbSwitch bool
 }
 
-func NewRouter(c *config.Router, iden identify.Indentify, mux *http.ServeMux) (r *Router) {
+func NewRouter(c *config.Router, mux *http.ServeMux) (r *Router) {
 	r = &Router{
 		c:        c,
 		Mux:      mux,
 		Hand:     NewHandle(mux),
-		Identify: iden,
+		Identify: identify.New(c.Indentify),
 	}
+	// slb check
 	r.slbCheck()
 	return
-}
-
-// 登录
-func (r *Router) Login(p string) {
-	r.Hand.PostFunc(p, r.preHandler, r.LoginHandler, r.writerHandler)
-}
-
-// 登出
-func (r *Router) Logout(p string) {
-	r.Hand.GetFunc(p, r.preHandler, r.LogoutHandler, r.writerHandler)
 }
 
 func (r *Router) GuestGet(p string, hf HandlerFunc) {
@@ -43,12 +34,13 @@ func (r *Router) GuestPost(p string, hf HandlerFunc) {
 	r.Hand.PostFunc(p, r.preHandler, hf, r.writerHandler)
 }
 
+// todo user check
 func (r *Router) UserGet(p string, hf HandlerFunc) {
-	r.Hand.GetFunc(p, r.preHandler, r.isLoginHandler, hf, r.writerHandler)
+	r.Hand.GetFunc(p, r.preHandler, hf, r.writerHandler)
 }
 
 func (r *Router) UserPost(p string, hf HandlerFunc) {
-	r.Hand.PostFunc(p, r.preHandler, r.isLoginHandler, hf, r.writerHandler)
+	r.Hand.PostFunc(p, r.preHandler, hf, r.writerHandler)
 }
 
 func (r *Router) VerifyGet(p string, hf HandlerFunc) {

@@ -108,9 +108,7 @@ type Router struct {
 }
 
 type Identify struct {
-	App   *App
-	Redis *Redis // can be nil
-	Mysql *Mysql // can be nil
+	App *App
 }
 
 type App struct {

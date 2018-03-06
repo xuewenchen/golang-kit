@@ -6,7 +6,6 @@ import (
 	"golang-kit/config"
 	"golang-kit/net/etcd"
 	"google.golang.org/grpc"
-	"time"
 )
 
 type GrpcClient struct {
@@ -22,8 +21,6 @@ func NewClient(c *config.GrpcClient, tracer opentracing.Tracer) (client *GrpcCli
 		grpc.WithInsecure(),
 		grpc.WithBalancer(b),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(tracer, otgrpc.LogPayloads())),
-		grpc.WithBlock(),
-		grpc.WithTimeout(time.Second*2),
 	)
 
 	client = &GrpcClient{
