@@ -44,7 +44,7 @@ func (r *Handle) PostFunc(pattern string, handlers ...HandlerFunc) {
 
 func handleFunc(method string, w http.ResponseWriter, r *http.Request, handlers []HandlerFunc) {
 	log.Info(r.RequestURI)
-	if r.Method != method {
+	if r.Method != method && r.Method != "OPTIONS" {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}

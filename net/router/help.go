@@ -35,10 +35,41 @@ func (r *Router) preHandler(c kitCtx.Context) {
 			if strings.HasSuffix(origin, host) {
 				resp.Header().Set("Access-Control-Allow-Origin", origin)
 				resp.Header().Set("Access-Control-Allow-Credentials", "true")
-				resp.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+				resp.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 				break
 			}
 		}
+	}
+	return
+}
+
+func (r *Router) LoginHandler(c kitCtx.Context) {
+	if err := r.Identify.Login(c); err != nil {
+		c.Result()["code"] = err
+	} else {
+		c.Result()["code"] = ecode.OK
+	}
+	r.writerHandler(c)
+	c.Cancel()
+	return
+}
+
+func (r *Router) LogoutHandler(c kitCtx.Context) {
+	if err := r.Identify.Logout(c); err != nil {
+		c.Result()["code"] = err
+	} else {
+		c.Result()["code"] = ecode.OK
+	}
+	r.writerHandler(c)
+	c.Cancel()
+	return
+}
+
+func (r *Router) isLoginHandler(c kitCtx.Context) {
+	if err := r.Identify.IsLogin(c); err != nil {
+		c.Result()["code"] = err
+		r.writerHandler(c)
+		c.Cancel()
 	}
 	return
 }
@@ -82,16 +113,18 @@ func (r *Router) JSONResult(c kitCtx.Context) (bs []byte) {
 	// code
 	if res["code"] == nil {
 		res["code"] = ret
+		res["message"] = "OK"
 	} else {
 		switch res["code"].(type) {
-		case error:
-			ec, _ := res["code"].(error)
-			ret = ecode.Lookup(ec)
-			res["message"] = ret.Message()
 		case ecode2.Ecode2:
 			ec, _ := res["code"].(ecode2.Ecode2)
 			res["code"] = ec.ToInt()
 			res["message"] = ec.ToString()
+		case error:
+			ec, _ := res["code"].(error)
+			ret = ecode.Lookup(ec)
+			res["code"] = int(ret)
+			res["message"] = ret.Message()
 		default:
 			ret = ecode.ServerErr
 			res["message"] = ret.Message()

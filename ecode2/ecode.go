@@ -24,3 +24,7 @@ func (e *Ecode) ToInt() int {
 func (e *Ecode) ToString() string {
 	return e.Message
 }
+
+func (e *Ecode) Error() string {
+	return e.Message
+}
